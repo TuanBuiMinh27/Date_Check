@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kiểm tra date in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEF1F4;--sf:#fff;--ink:#14212B;--mu:#5B6B78;--ln:#D5DCE2;--br:#0F5C7A;--brt:#fff;--ok:#1E7A46;--okb:#E3F3EA;--bad:#B3261E;--badb:#FBE7E5;--wn:#8A5A00;--wnb:#FFF1D6;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F161C;--sf:#17212A;--ink:#E8EEF2;--mu:#9AAAB6;--ln:#2A3844;--br:#5CB8DA;--brt:#0B1A22;--ok:#5FD08B;--okb:#12301F;--bad:#FF8A80;--badb:#3A1816;--wn:#FFC266;--wnb:#3A2A0C;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F161C;--sf:#17212A;--ink:#E8EEF2;--mu:#9AAAB6;--ln:#2A3844;--br:#5CB8DA;--brt:#0B1A22;--ok:#5FD08B;--okb:#12301F;--bad:#FF8A80;--badb:#3A1816;--wn:#FFC266;--wnb:#3A2A0C;color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 "Be Vietnam Pro",system-ui,sans-serif}
+.app{max-width:1040px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:22px;margin:0;font-weight:700}h2{font-size:15px;margin:0 0 12px;font-weight:600}
+.sub{color:var(--mu);font-size:13px;margin:2px 0 16px}
+nav{display:flex;gap:4px;border-bottom:1px solid var(--ln);margin-bottom:16px;overflow-x:auto}
+nav button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px;font:inherit;font-weight:500;color:var(--mu);cursor:pointer;white-space:nowrap}
+nav button[aria-selected="true"]{color:var(--ink);border-color:var(--br)}
+:focus-visible{outline:2px solid var(--br);outline-offset:2px}
+.grid{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:860px){.two{grid-template-columns:minmax(0,5fr) minmax(0,6fr)}}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:10px;padding:16px}
+.f{display:grid;grid-template-columns:1fr 1fr;gap:12px}.f .w{grid-column:1/-1}
+label{display:block;font-size:13px;color:var(--mu);margin-bottom:4px}
+select,input:not([type=checkbox]),textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--ln);border-radius:6px;padding:9px 10px;min-height:42px}
+textarea{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:500;min-height:90px;resize:vertical}
+.btn{font:inherit;font-weight:600;border-radius:6px;border:1px solid var(--br);background:var(--br);color:var(--brt);padding:10px 16px;min-height:44px;cursor:pointer}
+.btn.ghost{background:none;color:var(--br)}.btn.sm{min-height:34px;padding:4px 10px;font-weight:500;font-size:13px}.btn.del{color:var(--bad);border-color:var(--bad)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.shot{display:flex;align-items:center;justify-content:center;min-height:110px;border:1.5px dashed var(--ln);border-radius:8px;margin:10px 0;overflow:hidden;color:var(--mu);font-size:13px}
+.shot img{max-width:100%;max-height:200px;display:block}
+.ref{background:#18222B;color:#FFD479;border-radius:8px;padding:14px 16px;font:500 17px/1.7 "IBM Plex Mono",ui-monospace,monospace;overflow-x:auto;white-space:pre}
+.ref small{display:block;font:400 12px "Be Vietnam Pro",sans-serif;color:#9FB2C1;margin-top:6px;white-space:pre-wrap}
+.verdict{border-radius:8px;padding:14px 16px;margin:12px 0;border-left:8px solid}
+.verdict b{display:block;font-size:26px}.verdict span{font-size:14px;color:var(--ink)}
+.verdict.ok{background:var(--okb);color:var(--ok);border-color:var(--ok)}.verdict.bad{background:var(--badb);color:var(--bad);border-color:var(--bad)}.verdict.wn{background:var(--wnb);color:var(--wn);border-color:var(--wn)}
+.r{display:grid;grid-template-columns:64px 1fr 1fr;gap:4px 12px;padding:10px 0;border-top:1px solid var(--ln)}
+.r small{display:block;color:var(--mu);font-size:12px}.r code{font:500 14px "IBM Plex Mono",monospace;overflow-wrap:anywhere}
+.r .rl{font-weight:600;font-size:13px}.r .why{grid-column:2/-1;font-size:13px;font-weight:500}
+.r.ok .why{color:var(--ok)}.r.bad .why,.r.bad code.g{color:var(--bad)}.r.wn .why{color:var(--wn)}
+details{border-top:1px solid var(--ln);padding:10px 0}details:first-of-type{border-top:0}
+summary{cursor:pointer;font-weight:600}summary small{font-weight:400;color:var(--mu);margin-left:8px}
+.std{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px}.std .w{grid-column:1/-1}
+.rec{font-size:12px;color:var(--mu);margin-top:4px;overflow-wrap:anywhere}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--ink)}.chk input{width:18px;height:18px}
+.hi{display:grid;grid-template-columns:auto 1fr auto;gap:2px 12px;padding:10px 0;border-top:1px solid var(--ln);align-items:center;font-size:14px}.hi:first-child{border-top:0}.hi small{color:var(--mu)}
+.tag{font-weight:700;font-size:13px;padding:2px 10px;border-radius:99px}.tag.ok{background:var(--okb);color:var(--ok)}.tag.bad{background:var(--badb);color:var(--bad)}.tag.wn{background:var(--wnb);color:var(--wn)}
+.note{font-size:13px;color:var(--mu);margin:0 0 12px}
+.stats{display:flex;gap:20px;margin-bottom:8px}.stats b{font-size:22px;display:block}
+#msg{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;max-width:90%;display:none;z-index:5}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="app">
+<h1>Kiểm tra date in trên sản phẩm</h1>
+<p class="sub">Bản demo: OCR đang mô phỏng. Tiêu chuẩn lấy từ file Date_Piattos.xlsx.</p>
+<nav role="tablist">
+<button role="tab" data-t="check" aria-selected="true">Kiểm tra</button>
+<button role="tab" data-t="std" aria-selected="false">Tiêu chuẩn</button>
+<button role="tab" data-t="his" aria-selected="false">Lịch sử</button>
+</nav>
+
+<section id="p-check" class="grid two">
+<div class="grid" style="align-content:start">
+<div class="card"><h2>Thông tin kiểm tra</h2>
+<div class="f">
+<div><label for="cust">Khách hàng</label><select id="cust"></select></div>
+<div><label for="where">Vị trí in</label><select id="where"><option value="goi">Date gói</option><option value="thung">Date thùng</option></select></div>
+<div><label for="pd">NSX (ngày sản xuất)</label><input type="date" id="pd"></div>
+<div><label for="shift">Ca</label><select id="shift"><option value="A">Ca A</option><option value="B">Ca B</option></select></div>
+</div></div>
+<div class="card"><h2>Date đọc được trên sản phẩm</h2>
+<input type="file" id="img" accept="image/*" capture="environment" hidden>
+<div class="row"><button class="btn ghost" id="snap" type="button">Chụp ảnh date</button><button class="btn" id="read" type="button">Đọc nội dung từ ảnh</button></div>
+<div class="shot" id="shot">Chưa có ảnh</div>
+<label for="ocr">Mỗi dòng in là một dòng (có thể sửa)</label>
+<textarea id="ocr" placeholder="PD25OCT26&#10;BB25OCT27&#10;01A 10:30"></textarea>
+<div class="row" style="margin-top:12px"><button class="btn" id="go" type="button">Đối chiếu tiêu chuẩn</button><button class="btn ghost sm" id="okx" type="button">Điền mẫu đúng</button><button class="btn ghost sm" id="badx" type="button">Điền mẫu sai</button></div>
+</div></div>
+<div class="grid" style="align-content:start">
+<div class="card"><h2>Tem in chuẩn</h2><div class="ref" id="ref"></div></div>
+<div class="card" id="res"><h2>Kết quả</h2><p class="note" style="margin:0">Nhập nội dung rồi bấm Đối chiếu tiêu chuẩn.</p></div>
+</div>
+</section>
+
+<section id="p-std" hidden>
+<div class="card"><h2>Tiêu chuẩn theo khách hàng</h2>
+<p class="note">Có hai cách nhập thêm: <b>Nhập từ Excel</b> (đọc các dòng "Mẫu" trong sheet Plan) hoặc <b>Thêm khách hàng</b> rồi gõ mẫu in vào hai ô Date gói, Date thùng. Mẫu viết như trong file Excel: DD, MM, MMM (AUG), YY, YYYY cho ngày; PD là tiền tố NSX; BB, E là tiền tố HSD; HH:MM là giờ; YS là A + mã ca. Dòng không đọc được (ví dụ mã EX... của Mỹ, Canada) sẽ được đánh dấu cần kiểm bằng mắt.</p>
+<div class="row" style="margin-bottom:8px"><button class="btn" id="add" type="button">Thêm khách hàng</button><button class="btn ghost" id="impb" type="button">Nhập từ Excel</button><input type="file" id="imp" accept=".xlsx,.xlsm" hidden></div>
+<div id="stdl"></div></div>
+</section>
+
+<section id="p-his" hidden>
+<div class="card"><h2>Lịch sử kiểm tra</h2><div class="stats" id="stats"></div><div id="hl"></div>
+<div style="margin-top:12px"><button class="btn ghost sm" id="clr" type="button">Xóa lịch sử</button></div></div>
+</section>
+</div>
+<div id="msg" role="status" aria-live="polite"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const $=s=>document.querySelector(s),p2=n=>String(n).padStart(2,"0");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const reE=s=>s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+const MON=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+const SEED=[
+{po:"GLFD",name:"GL Food – USA",country:"USA",goi:"EXMDDMASPA5\n01A HH:MM",thung:"EXMDDMASPA\nGL FOOD, USA"},
+{po:"NRID",name:"N-Ridge – USA",country:"USA",goi:"EXMDDMASPA5\n01A HH:MM",thung:"EXMDDMASPA\nN-RIDGE, USA"},
+{po:"UNOF",name:"UNO – Canada",country:"CANADA",goi:"EXMDDMASPA1\n01A HH:MM",thung:"EXMDDMASPA\nUNO, CAN",note:"Chưa có sticker"},
+{po:"AMNO",name:"AMNO – Mongolia",country:"Mongolia",goi:"PDDDMMMYY\nBBDDMMMYY\n01A HH:MM",thung:"PDDDMMMYY\nBBDDMMMYY\nAMNO, MNG"},
+{po:"URCHK",name:"URC HK – Hong Kong",country:"HK",goi:"PD DDMMYYYY\nBB DDMMYYYY\nMCS HH:MM",thung:"PD DDMMYYYY\nBB DDMMYYYY",note:"HSD lùi 1 ngày từ NSX\nIn date thùng 1 mặt"},
+{po:"HAIM",name:"HAIM – Korea",country:"Korea",goi:"EYYYYMMDD\nMCS HH:MM",thung:"EYYYYMMDD\nHAIM, KOR",note:"HSD lùi 1 ngày từ NSX\nIn date thùng 1 mặt"},
+{po:"TREM",name:"Tres Marias – New Zealand",country:"New Zealand",goi:"PD DDMMMYY\nBB DDMMMYY\nMCS HH:MM",thung:"PD DDMMMYY\nBB DDMMMYY\nTRES MARIAS, NZ"},
+{po:"GRAN",name:"Grand Mart – Bahrain",country:"Bahrain",goi:"DDMMMYY BC\nDDMMMYY YS\n01A HH:MM",thung:"DDMMMYY BC\nDDMMMYY YS\nGrand Mart, Bahrain",note:"\"BC\" cố định\n\"AA\": chữ A đầu giữ nguyên, A sau là ca sản xuất (A hoặc B)"},
+{po:"SUNG",name:"Sungar Niumi – PNG",country:"HK",goi:"PD DDMMMYY\nBB DDMMMYY\n01A HH:MM",thung:"PD DDMMMYY\nBB DDMMMYY\nSUNGAR_NIUMI, PNG"},
+{po:"DKSH",name:"DKSH – Singapore",country:"SG",goi:"PD DDMMMYY\nBB DDMMMYY\n01A HH:MM",thung:"Singapore Distributor: DKSH SINGAPORE PTE. LTD.\n151 Lorong Chuan, New Tech Park, Lobby C, #06-03 Singapore 556741\nPD DDMMMYY\nBB DDMMMYY",note:"Chưa có sticker, dán offline"},
+{po:"SHAN",name:"MS Giant – UAE (Dubai)",country:"DUBAI",goi:"DDMMMYY BC\nDDMMMYY YS\n01A HH:MM",thung:"DDMMMYY BC\nDDMMMYY YS\nMS GIANT, UAE",note:"\"BC\" cố định\n\"AA\": chữ A đầu giữ nguyên, A sau là ca sản xuất (A hoặc B)"}];
+const mk=s=>({id:"c"+Math.random().toString(36).slice(2,8),po:s.po||"",name:s.name||"Khách hàng mới",country:s.country||"",goi:s.goi||"",thung:s.thung||"",note:s.note||"",minus1:/lùi 1 ngày/i.test(s.note||""),life:12});
+let C=[],H=[];
+try{C=JSON.parse(localStorage.getItem("dateStd")||"[]");H=JSON.parse(localStorage.getItem("dateHist")||"[]")}catch(e){}
+if(!C.length)C=SEED.map(mk);
+const save=()=>{try{localStorage.setItem("dateStd",JSON.stringify(C));localStorage.setItem("dateHist",JSON.stringify(H.slice(0,100)))}catch(e){}};
+let tm;const msg=t=>{const m=$("#msg");m.textContent=t;m.style.display="block";clearTimeout(tm);tm=setTimeout(()=>m.style.display="none",3500)};
+
+const fd=(d,f)=>f.replace(/YYYY|YY|MMM|MM|DD/g,t=>t==="YYYY"?d.getFullYear():t==="YY"?String(d.getFullYear()).slice(-2):t==="MMM"?MON[d.getMonth()]:t==="MM"?p2(d.getMonth()+1):p2(d.getDate()));
+function addM(d,n){const r=new Date(d.getFullYear(),d.getMonth()+n,1),l=new Date(r.getFullYear(),r.getMonth()+1,0).getDate();r.setDate(Math.min(d.getDate(),l));return r}
+const hsd=(d,c)=>{const h=addM(d,c.life);return c.minus1?new Date(h.getFullYear(),h.getMonth(),h.getDate()-1):h};
+const nz=s=>String(s).replace(/\s+/g," ").trim().toUpperCase();
+const DP=/^(PD ?|BB ?|EX|E)?((?:YYYY|YY|MMM|MM|DD|[\/.\-])+)(.*)$/;
+function lines(t){let n=0;return String(t||"").replace(/\[xuống dòng\]/g,"").split(/\n/).map(s=>s.trim()).filter(Boolean).map(s=>{
+ const m=s.match(DP);
+ if(m&&/DD|MM|YY/.test(m[2])){const pre=m[1]||"";return{k:"date",raw:s,pre,fmt:m[2],suf:m[3],base:/^PD/.test(pre)?"nsx":pre?"hsd":(n++?"hsd":"nsx")}}
+ if(/HH:MM/.test(s))return{k:"time",raw:s,lit:s.replace("HH:MM","").trim()};
+ if(/^EX/.test(s))return{k:"manual",raw:s};
+ return{k:"text",raw:s}})}
+function exp(l,c,d,sh){if(l.k!=="date")return l;const dt=l.base==="nsx"?d:hsd(d,c);return{...l,date:dt,val:(l.pre+fd(dt,l.fmt)+l.suf.replace("YS","A"+sh)).replace(/\s+/g," ").trim()}}
+const cur=()=>C.find(c=>c.id===$("#cust").value)||C[0];
+const prod=()=>{const[y,m,d]=($("#pd").value||"").split("-").map(Number);return y?new Date(y,m-1,d):new Date()};
+const expLines=()=>{const c=cur();return c?lines(c[$("#where").value]).map(l=>exp(l,c,prod(),$("#shift").value)):[]};
+const TAG={nsx:"NSX",hsd:"HSD",time:"Giờ",text:"Cố định",manual:"Mã riêng"};
+
+function preview(){const c=cur();if(!c)return;$("#ref").innerHTML=esc(expLines().map(e=>e.k==="date"?e.val:e.raw).join("\n"))+(c.note||c.minus1?`<small>${esc(c.note||"")}${c.minus1&&!/lùi/i.test(c.note||"")?"HSD lùi 1 ngày so với NSX":""}</small>`:"")}
+
+function judge(e,g){
+ const o={tag:e.k==="date"?TAG[e.base]:TAG[e.k],val:e.k==="date"?e.val:e.raw,got:g??null,ok:false,why:""};
+ if(g==null){o.why="Thiếu dòng này trên sản phẩm";return o}
+ const G=nz(g);
+ if(e.k==="manual"){o.ok=null;o.why="Chưa có quy tắc cho mã này, cần kiểm bằng mắt";return o}
+ if(e.k==="text"){o.ok=G===nz(e.raw);if(!o.ok)o.why="Sai nội dung cố định";return o}
+ if(e.k==="time"){o.ok=new RegExp("^"+reE(nz(e.lit))+" ?\\d{1,2}:\\d{2}$").test(G);if(!o.ok)o.why=`Sai mã hoặc giờ (chuẩn ${e.raw})`;return o}
+ const V=nz(e.val);
+ if(G===V){o.ok=true;return o}
+ if(G.replace(/ /g,"")===V.replace(/ /g,"")){o.why=`Sai khoảng trắng (chuẩn "${e.val}")`;return o}
+ let b=G;const P=nz(e.pre);if(P&&b.startsWith(P))b=b.slice(P.length).trim();
+ const tk=e.fmt.match(/YYYY|YY|MMM|MM|DD/g),rx=e.fmt.replace(/YYYY|YY|MMM|MM|DD|([\/.\-])/g,(t,s)=>s?"\\"+s:{YYYY:"(\\d{4})",YY:"(\\d{2})",MMM:"([A-Z]{3})",MM:"(\\d{2})",DD:"(\\d{2})"}[t]);
+ const m=b.match(new RegExp("^"+rx));
+ if(!m){o.why=`Không đọc được ngày theo định dạng ${e.fmt}`;return o}
+ let y,mo,d;tk.forEach((t,i)=>{const v=m[i+1];if(t==="YYYY")y=+v;else if(t==="YY")y=2000+ +v;else if(t==="MMM")mo=MON.indexOf(v);else if(t==="MM")mo=+v-1;else d=+v});
+ const dt=new Date(y,mo,d),ok=mo>=0&&dt.getMonth()===mo&&dt.getDate()===d;
+ if(!ok||dt.getTime()!==e.date.getTime()){o.why=`Sai ngày: đọc ${ok?fd(dt,"DD/MM/YYYY"):"ngày không hợp lệ"}, chuẩn ${fd(e.date,"DD/MM/YYYY")}`;return o}
+ o.why=`Sai ký tự cố định (chuẩn "${e.val}")`;return o}
+
+function check(){
+ const c=cur(),E=expLines(),R=$("#ocr").value.split(/\n/).map(s=>s.trim()).filter(Boolean);
+ if(!c||!E.length){msg("Khách hàng này chưa có mẫu in cho vị trí đã chọn");return}
+ if(!R.length){msg("Chưa có nội dung. Chụp ảnh rồi bấm Đọc nội dung từ ảnh, hoặc nhập tay.");return}
+ const rows=E.map((e,i)=>judge(e,R[i]));
+ for(let i=E.length;i<R.length;i++)rows.push({tag:"Thừa",val:"—",got:R[i],ok:false,why:"Dòng này không có trong tiêu chuẩn"});
+ const bad=rows.filter(r=>r.ok===false),wn=rows.filter(r=>r.ok===null),st=bad.length?"bad":wn.length?"wn":"ok";
+ const title={ok:"ĐẠT",bad:"KHÔNG ĐẠT",wn:"CẦN KIỂM TAY"}[st];
+ const sub={ok:`${rows.length}/${rows.length} dòng khớp tiêu chuẩn`,bad:`${bad.length}/${rows.length} dòng sai`,wn:`${wn.length} dòng chưa có quy tắc, các dòng còn lại khớp`}[st];
+ $("#res").innerHTML=`<h2>Kết quả</h2><div class="verdict ${st}"><b>${title}</b><span>${sub}</span></div>`+rows.map(r=>`<div class="r ${r.ok===true?"ok":r.ok===false?"bad":"wn"}"><div class="rl">${r.tag}</div><div><small>Chuẩn</small><code>${esc(r.val)}</code></div><div><small>Đọc được</small><code class="g">${esc(r.got??"—")}</code></div><div class="why">${r.ok===true?"✓ Khớp":(r.ok===false?"✕ ":"⚠ ")+esc(r.why)}</div></div>`).join("");
+ H.unshift({t:Date.now(),c:c.name,w:$("#where").value==="goi"?"Gói":"Thùng",s:$("#shift").value,st,n:bad.map(r=>r.tag).join(", ")});save();renderHis();
+ $("#res").scrollIntoView({behavior:"smooth",block:"nearest"})}
+
+function sample(bad){const E=expLines(),sh=$("#shift").value;
+ const out=E.map(e=>e.k==="date"?e.val:e.k==="time"?e.raw.replace("HH:MM","10:30"):e.raw);
+ if(bad){const i=E.map(e=>e.k).lastIndexOf("date");if(i>=0){const e=E[i],w=new Date(e.date.getFullYear(),e.date.getMonth(),e.date.getDate()+1);out[i]=(e.pre+fd(w,e.fmt)+e.suf.replace("YS","A"+sh)).replace(/\s+/g," ").trim()}}
+ return out.join("\n")}
+$("#okx").onclick=()=>{$("#ocr").value=sample(false)};
+$("#badx").onclick=()=>{$("#ocr").value=sample(true)};
+$("#read").onclick=()=>{$("#ocr").value=sample(Math.random()<.4);msg("Đã đọc (mô phỏng). Kiểm tra lại nội dung trước khi đối chiếu.")};
+$("#snap").onclick=()=>$("#img").click();
+$("#img").onchange=e=>{const f=e.target.files[0];if(f)$("#shot").innerHTML=`<img alt="Ảnh date đã chụp" src="${URL.createObjectURL(f)}">`};
+$("#go").onclick=check;
+["cust","where","shift","pd"].forEach(i=>$("#"+i).addEventListener("change",preview));
+
+const rec=(t)=>lines(t).map(l=>l.k==="date"?`${l.base==="nsx"?"NSX":"HSD"}: ${l.raw}`:l.k==="time"?"Giờ":l.k==="manual"?"⚠ mã riêng, chưa có quy tắc":"chữ cố định").join(" | ")||"Chưa có dòng nào";
+function renderCust(){const v=$("#cust").value;$("#cust").innerHTML=C.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("");if(C.some(c=>c.id===v))$("#cust").value=v;preview()}
+function renderStd(){$("#stdl").innerHTML=C.map((c,i)=>`<details data-i="${i}"><summary>${esc(c.name)}<small>${esc(c.country)}</small></summary><div class="std">
+<div><label>Tên khách hàng</label><input data-k="name" value="${esc(c.name)}"></div>
+<div><label>Quốc gia</label><input data-k="country" value="${esc(c.country)}"></div>
+<div><label>Mẫu Date gói</label><textarea data-k="goi">${esc(c.goi)}</textarea><div class="rec" id="rg${i}">${esc(rec(c.goi))}</div></div>
+<div><label>Mẫu Date thùng</label><textarea data-k="thung">${esc(c.thung)}</textarea><div class="rec" id="rt${i}">${esc(rec(c.thung))}</div></div>
+<div><label>Hạn dùng (tháng)</label><input type="number" min="1" max="60" data-k="life" value="${c.life}"></div>
+<div class="chk" style="align-self:end"><input type="checkbox" data-k="minus1" id="m${i}" ${c.minus1?"checked":""}><label for="m${i}" style="margin:0;color:inherit">HSD lùi 1 ngày so với NSX</label></div>
+<div class="w"><label>Ghi chú</label><textarea data-k="note" style="min-height:60px;font-family:inherit">${esc(c.note)}</textarea></div>
+<div class="w"><button class="btn ghost sm del" data-del="${i}" type="button">Xóa khách hàng</button></div></div></details>`).join("")||`<p class="note">Chưa có tiêu chuẩn nào.</p>`}
+$("#stdl").addEventListener("input",e=>{const t=e.target,d=t.closest("details"),k=t.dataset.k;if(!d||!k)return;const i=+d.dataset.i;
+ C[i][k]=t.type==="checkbox"?t.checked:k==="life"?(+t.value||12):t.value;
+ if(k==="goi")$("#rg"+i).textContent=rec(t.value);if(k==="thung")$("#rt"+i).textContent=rec(t.value);
+ if(k==="name"||k==="country")d.querySelector("summary").innerHTML=`${esc(C[i].name)}<small>${esc(C[i].country)}</small>`;
+ save();renderCust()});
+$("#stdl").addEventListener("click",e=>{const i=e.target.dataset.del;if(i==null)return;C.splice(+i,1);save();renderStd();renderCust()});
+$("#add").onclick=()=>{C.unshift(mk({}));save();renderStd();renderCust();const d=$("#stdl details");if(d)d.open=true};
+$("#impb").onclick=()=>$("#imp").click();
+$("#imp").onchange=e=>{const f=e.target.files[0];if(!f)return;if(!window.XLSX){msg("Chưa tải được thư viện đọc Excel");return}
+ const r=new FileReader();r.onload=()=>{try{
+  const wb=XLSX.read(r.result,{type:"array"}),ws=wb.Sheets["Plan"]||wb.Sheets[wb.SheetNames[0]],rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:true});
+  const Hd=rows[0].map(h=>String(h||"").trim()),ix=n=>Hd.indexOf(n),iF=ix("Format"),iP=ix("Customer PO#"),iC=ix("Country"),iG=ix("Date gói"),iT=ix("Date thùng"),iN=ix("Ghi chú");
+  if([iF,iP,iG,iT].some(i=>i<0)){msg("Không thấy các cột Format, Customer PO#, Date gói, Date thùng");return}
+  const seen={};let a=0,u=0;
+  rows.slice(1).forEach(r=>{if(r[iF]!=="Mẫu"||!r[iP])return;const po=String(r[iP]).split("-")[0];if(seen[po])return;seen[po]=1;
+   const th=String(r[iT]||"").split("\n").map(s=>s.trim()).filter(Boolean),last=th[th.length-1]||"",ctry=r[iC]||"";
+   const s={po,name:/,/.test(last)&&!DP.test(last)?last:po+(ctry?" – "+ctry:""),country:ctry,goi:r[iG]||"",thung:r[iT]||"",note:iN>=0?r[iN]||"":""};
+   const ex=C.find(x=>x.po===po);
+   if(ex){ex.goi=s.goi;ex.thung=s.thung;if(s.note){ex.note=s.note;ex.minus1=/lùi 1 ngày/i.test(s.note)}u++}else{C.push(mk(s));a++}});
+  save();renderStd();renderCust();msg(`Đã nhập từ Excel: ${a} khách hàng mới, ${u} cập nhật`)}catch(err){msg("Không đọc được file Excel này")}};
+ r.readAsArrayBuffer(f);e.target.value=""};
+
+const SL={ok:"Đạt",bad:"Không đạt",wn:"Kiểm tay"};
+function renderHis(){const n=s=>H.filter(h=>h.st===s).length;
+ $("#stats").innerHTML=`<div><b>${H.length}</b><small>lượt kiểm</small></div><div><b>${n("ok")}</b><small>đạt</small></div><div><b>${n("bad")}</b><small>không đạt</small></div>`;
+ $("#hl").innerHTML=H.length?H.slice(0,50).map(h=>{const d=new Date(h.t);return`<div class="hi"><span>${p2(d.getHours())}:${p2(d.getMinutes())}<br><small>${p2(d.getDate())}/${p2(d.getMonth()+1)}</small></span><span>${esc(h.c)}<br><small>${h.w} · Ca ${esc(h.s)}${h.n?" · lỗi: "+esc(h.n):""}</small></span><span class="tag ${h.st}">${SL[h.st]}</span></div>`}).join(""):`<p class="note" style="margin:0">Chưa có lượt kiểm tra nào.</p>`}
+$("#clr").onclick=()=>{H=[];save();renderHis()};
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected",x===b));["check","std","his"].forEach(t=>$("#p-"+t).hidden=t!==b.dataset.t)});
+const n=new Date();$("#pd").value=n.getFullYear()+"-"+p2(n.getMonth()+1)+"-"+p2(n.getDate());
+renderCust();renderStd();renderHis();
+</script>
+</body>
+</html>
