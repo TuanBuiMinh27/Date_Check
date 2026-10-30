@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Kiểm tra date Sản phẩm Snack</title>
+<title>Kiểm tra date in</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
@@ -64,6 +64,7 @@ summary{cursor:pointer;font-weight:600}summary small{font-weight:400;color:var(-
 <button role="tab" data-t="check" aria-selected="true">Kiểm tra</button>
 <button role="tab" data-t="std" aria-selected="false">Tiêu chuẩn</button>
 <button role="tab" data-t="his" aria-selected="false">Lịch sử</button>
+<button role="tab" data-t="trn" aria-selected="false">Huấn luyện AI</button>
 </nav>
 
 <section id="p-check" class="grid two">
@@ -82,14 +83,15 @@ summary{cursor:pointer;font-weight:600}summary small{font-weight:400;color:var(-
 <div class="shot" id="shot">Chưa có ảnh</div>
 <div class="row" id="cropbar" hidden style="margin:0 0 8px"><span class="note" style="margin:0;flex:1">Kéo trên ảnh để khoanh vùng chỉ gồm dòng date cần đọc. Không khoanh thì đọc cả ảnh.</span><button class="btn ghost sm" id="rot" type="button">Xoay ảnh 90°</button><button class="btn ghost sm" id="clrsel" type="button">Xóa vùng chọn</button></div>
 <p class="note" id="ocrst" style="margin:0 0 10px">Đang kiểm tra chức năng đọc ảnh...</p>
-<div class="row" id="tessopt" style="margin:0 0 10px"><label for="blur" style="margin:0">Kiểu chữ in</label><select id="blur" style="width:auto"><option value="0">Nét rõ (laser, tem)</option><option value="1" selected>In phun chấm, nối vừa</option><option value="2">In phun chấm, nối mạnh</option></select></div>
+<div class="row" id="tessopt" style="margin:0 0 10px"><label for="blur" style="margin:0">Cách xử lý ảnh</label><select id="blur" style="width:auto;max-width:100%"><option value="auto" selected>Tự động thử nhiều cách (khuyên dùng)</option><option value="clean">Chữ nét rõ (laser, tem)</option><option value="dot">In phun chấm</option><option value="carton">Thùng carton có vân nền</option></select></div>
 <div id="dbg"></div>
 <label for="ocr">Nội dung đọc từ ảnh, mỗi dòng in là một dòng (sửa nếu đọc sai)</label>
 <textarea id="ocr" placeholder="Nội dung đọc từ ảnh sẽ hiện ở đây"></textarea>
-<div class="row" style="margin-top:12px"><button class="btn" id="go" type="button">Đối chiếu tiêu chuẩn</button></div>
+<label class="chk" style="margin-top:10px"><input type="checkbox" id="vf"><span>Tôi đã xem lại: nội dung trong ô khớp đúng chữ in trên ảnh (cần để lưu mẫu huấn luyện)</span></label>
+<div class="row" style="margin-top:12px"><button class="btn" id="go" type="button">Đối chiếu tiêu chuẩn</button><button class="btn ghost" id="sv" type="button">Lưu mẫu huấn luyện</button></div>
 </div></div>
 <div class="grid" style="align-content:start">
-<div class="card"><h2>Tiêu chuẩn in date</h2><div class="ref" id="ref"></div></div>
+<div class="card"><h2>Tem in chuẩn</h2><div class="ref" id="ref"></div></div>
 <div class="card" id="res"><h2>Kết quả</h2><p class="note" style="margin:0">Nhập nội dung rồi bấm Đối chiếu tiêu chuẩn.</p></div>
 </div>
 </section>
@@ -105,9 +107,21 @@ summary{cursor:pointer;font-weight:600}summary small{font-weight:400;color:var(-
 <div class="card"><h2>Lịch sử kiểm tra</h2><div class="stats" id="stats"></div><div id="hl"></div>
 <div style="margin-top:12px"><button class="btn ghost sm" id="clr" type="button">Xóa lịch sử</button></div></div>
 </section>
+<section id="p-trn" hidden>
+<div class="card"><h2>Dữ liệu huấn luyện AI đọc date</h2>
+<p class="note">Ở tab Kiểm tra, sau khi sửa nội dung cho khớp đúng chữ in trên ảnh, bạn tick xác nhận rồi bấm Lưu mẫu huấn luyện. Ảnh (đã khoanh vùng) và nội dung được lưu trong trình duyệt của máy này, chưa gửi đi đâu. Khi đủ số lượng, bấm Xuất ZIP rồi làm theo README trong bộ hướng dẫn huấn luyện.</p>
+<div id="trc"></div>
+<div class="row" style="margin:12px 0"><button class="btn" id="exp" type="button">Xuất ZIP</button><button class="btn ghost del" id="trdel" type="button">Xóa tất cả mẫu</button></div>
+<h2 style="margin-top:16px">Mẫu gần đây</h2><div id="trl"></div>
+<h2 style="margin-top:20px">Máy chủ đọc ảnh (Claude API hoặc AI riêng)</h2>
+<p class="note">Sau khi huấn luyện và triển khai, nhập địa chỉ máy chủ, ví dụ https://ten-may-chu. App sẽ gọi POST /read và luôn ưu tiên máy chủ này thay cho Claude trong claude.ai hoặc Tesseract. Để trống nếu chưa có.</p>
+<input id="aiurl" placeholder="https://..." autocomplete="off">
+<input id="aikey" placeholder="Mã truy cập (nếu máy chủ yêu cầu)" autocomplete="off" style="margin-top:8px">
+</div></section>
 </div>
 <div id="msg" role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
 <script>
 const $=s=>document.querySelector(s),p2=n=>String(n).padStart(2,"0");
@@ -154,12 +168,14 @@ const TAG={nsx:"NSX",hsd:"HSD",time:"Giờ",text:"Cố định",code:"Mã EX",ma
 
 function preview(){const c=cur();if(!c)return;const E=expLines(),hash=E.some(e=>((e.k==="code"&&e.mach)||e.mcode)&&!e.mc);const n=[c.note||"",c.minus1&&!/lùi/i.test(c.note||"")?"HSD lùi 1 ngày so với NSX":"",hash?"# = mã máy in (1 đến 9)":""].filter(Boolean).join("\n");$("#ref").innerHTML=esc(E.map(e=>e.val||e.raw).join("\n"))+(n?`<small>${esc(n)}</small>`:"")}
 
-const CF={O:"0QD",0:"OQD",I:"1L|",1:"IL|",L:"1I",S:"5",5:"S",B:"8",8:"B",Z:"2",2:"Z",G:"6",6:"G"};
+const CF={_:" "," ":"_",O:"0QD",0:"OQD",I:"1L|",1:"IL|",L:"1I",S:"5",5:"S",B:"8",8:"B",Z:"2",2:"Z",G:"6",6:"G"};
 function loose(a,b){if(a.length!==b.length)return null;const s=[];for(let i=0;i<a.length;i++){if(a[i]===b[i])continue;if(!(CF[b[i]]||"").includes(a[i]))return null;s.push(a[i]+"→"+b[i])}return s.length?s.join(", "):null}
 function judge(e,g){
  const o={tag:e.k==="date"?TAG[e.base]:TAG[e.k],val:e.val||e.raw,got:g??null,ok:false,why:""};
  if(g==null){o.why="Thiếu dòng này trên sản phẩm";return o}
  const G=nz(g);
+ if(G.includes("?")){o.ok=null;o.why="Có ký tự không đọc rõ (?), cần kiểm bằng mắt";return o}
+ const cf=CONF[G];if(cf!=null&&cf<.9){o.ok=null;o.why=`Độ tin cậy đọc thấp (${Math.round(cf*100)}%), cần kiểm bằng mắt`;return o}
  if(e.k==="manual"){o.ok=null;o.why="Chưa có quy tắc cho mã này, cần kiểm bằng mắt";return o}
  if(e.k==="code"){if(!/#/.test(e.val)){const lf=loose(G,nz(e.val));if(lf){o.ok=true;o.fix=lf;return o}}const m=G.match(/^EX(\d)(\d\d)(\d)([A-Z])([A-Z]{2})([A-Z])(\d?)$/);if(!m){o.why="Không đọc được mã theo cấu trúc EX + tháng, ngày + năm + SP + ca + máy";return o}
   const er=[],mo=m[1]+m[3],YR=Object.keys(YC).find(k=>YC[k]===m[4]);
@@ -168,7 +184,7 @@ function judge(e,g){
   if(m[6]!==e.shift)er.push(`ca (đọc ${m[6]}, chuẩn ${e.shift})`);
   if(e.mach){if(!m[7])er.push("thiếu mã máy");else if(e.mc&&m[7]!==e.mc)er.push(`mã máy (đọc ${m[7]}, chuẩn ${e.mc})`)}else if(m[7])er.push("date thùng không có mã máy");
   if(er.length)o.why="Sai "+er.join("; ");else o.ok=true;return o}
- if(e.k==="text"){o.ok=G===nz(e.raw);if(!o.ok)o.why="Sai nội dung cố định";return o}
+ if(e.k==="text"){o.ok=G===nz(e.raw);if(!o.ok){const lf=loose(G,nz(e.raw));if(lf){o.ok=true;o.fix=lf}else o.why="Sai nội dung cố định"}return o}
  if(e.k==="time"){const D="[0-9OILSBZ]",T=D+"{1,2}[:;]"+D+"{2}",fx=s=>s.replace(/O/g,"0").replace(/[IL]/g,"1").replace(/S/g,"5").replace(/B/g,"8").replace(/Z/g,"2");
  if(e.mcode){const m=G.match(new RegExp("^("+D+"{2})([A-Z]) ?"+T+"$"));
   if(!m){o.why=`Sai định dạng (chuẩn ${e.val.replace("##","NN")}, giờ dạng HH:MM)`;return o}
@@ -197,6 +213,7 @@ function check(){
  const rows=E.map((e,i)=>judge(e,pick[i]>=0?R[pick[i]]:undefined));
  R.forEach((r,k)=>{if(!used.has(k))rows.push({tag:"Thừa",val:"—",got:r,ok:false,why:"Dòng này không có trong tiêu chuẩn"})});
  const bad=rows.filter(r=>r.ok===false),wn=rows.filter(r=>r.ok===null),st=bad.length?"bad":wn.length?"wn":"ok";
+ LASTV=st;
  const title={ok:"ĐẠT",bad:"KHÔNG ĐẠT",wn:"CẦN KIỂM TAY"}[st];
  const sub={ok:`${rows.length}/${rows.length} dòng khớp tiêu chuẩn`,bad:`${bad.length}/${rows.length} dòng sai`,wn:`${wn.length} dòng chưa có quy tắc, các dòng còn lại khớp`}[st];
  $("#res").innerHTML=`<h2>Kết quả</h2><div class="verdict ${st}"><b>${title}</b><span>${sub}</span></div>`+rows.map(r=>`<div class="r ${r.ok===true?"ok":r.ok===false?"bad":"wn"}"><div class="rl">${r.tag}</div><div><small>Chuẩn</small><code>${esc(r.val)}</code></div><div><small>Đọc được</small><code class="g">${esc(r.got??"—")}</code></div><div class="why">${r.ok===true?"✓ Khớp"+(r.fix?` (bỏ qua nhầm lẫn OCR: ${esc(r.fix)})`:""):(r.ok===false?"✕ ":"⚠ ")+esc(r.why)}</div></div>`).join("");
@@ -209,30 +226,60 @@ function sample(bad){const E=expLines(),sh=$("#shift").value;
  return out.join("\n")}
 let IMG=null,SMP=null;
 let CLA=false;
-const st=t=>{$("#ocrst").textContent=t};
+const st=t=>{$("#ocrst").textContent=($("#aiurl").value&&$("#aiurl").value.trim())?"Đọc ảnh bằng máy chủ đã cấu hình ở tab Huấn luyện AI (nội dung đọc từ ảnh, không lấy từ tiêu chuẩn).":t};
 const tessMsg=()=>window.Tesseract?"Đọc ảnh bằng Tesseract chạy ngay trên trình duyệt (lần đầu cần internet để tải dữ liệu ngôn ngữ). Hãy khoanh vùng thật sát dòng date và kiểm tra lại nội dung trước khi đối chiếu.":"Chưa tải được thư viện đọc ảnh, hãy nhập nội dung tay.";
-async function prep(blob){const bm=await createImageBitmap(blob),s=Math.min(4,Math.max(1,1600/Math.max(bm.width,bm.height))),W=Math.round(bm.width*s),Hh=Math.round(bm.height*s),cv=document.createElement("canvas");cv.width=W;cv.height=Hh;
- const x=cv.getContext("2d",{willReadFrequently:true}),bl=[0,.9,1.8][+$("#blur").value||0]*s;
- x.filter="grayscale(1)"+(bl?` blur(${bl.toFixed(1)}px)`:"");x.drawImage(bm,0,0,W,Hh);x.filter="none";
- const d=x.getImageData(0,0,W,Hh),p=d.data,n=W*Hh,h=new Array(256).fill(0);for(let i=0;i<n;i++)h[p[i*4]]++;
- let sum=0;for(let t=0;t<256;t++)sum+=t*h[t];let sb=0,wb=0,mx=0,th=127;
- for(let t=0;t<256;t++){wb+=h[t];if(!wb)continue;const wf=n-wb;if(!wf)break;sb+=t*h[t];const mb=sb/wb,mf=(sum-sb)/wf,v=wb*wf*(mb-mf)*(mb-mf);if(v>mx){mx=v;th=t}}
- let dark=0;for(let i=0;i<n;i++)if(p[i*4]<=th)dark++;const inv=dark>n*.5;
- for(let i=0;i<n;i++){const v=((p[i*4]<=th)!==inv)?0:255;p[i*4]=p[i*4+1]=p[i*4+2]=v;p[i*4+3]=255}
- x.putImageData(d,0,0);const url=cv.toDataURL("image/png");
- return{url,blob:await new Promise(r=>cv.toBlob(r,"image/png"))}}
-async function localOcr(blob,onp){const pp=await prep(blob),img=pp.blob;$("#dbg").innerHTML=`<p class="note" style="margin:0 0 4px">Ảnh sau xử lý (đây là ảnh Tesseract nhìn thấy):</p><img alt="Ảnh sau xử lý" style="max-width:100%;border:1px solid var(--ln);border-radius:6px" src="${pp.url}">`;const w=await Tesseract.createWorker("eng",1,{logger:m=>{if(m.status==="recognizing text")onp(m.progress)}});
- try{await w.setParameters({tessedit_pageseg_mode:"6",preserve_interword_spaces:"1",tessedit_char_whitelist:"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:/.,-_ #()"});const r=await w.recognize(img);$("#dbg").insertAdjacentHTML("beforeend",`<p class="note" style="margin:4px 0 10px">Độ tin cậy trung bình: ${Math.round(r.data.confidence)}%</p>`);return r.data.text}finally{await w.terminate()}}
+function toGray(d,n){const g=new Uint8ClampedArray(n);for(let i=0;i<n;i++)g[i]=(d[i*4]*299+d[i*4+1]*587+d[i*4+2]*114)/1000;return g}
+function boxBlur(g,W,H,r){if(r<1)return g;const t=new Float32Array(W*H),o=new Uint8ClampedArray(W*H),w=2*r+1,cl=(v,m)=>v<0?0:v>m?m:v;
+ for(let y=0;y<H;y++){let s=0;const b=y*W;for(let x=-r;x<=r;x++)s+=g[b+cl(x,W-1)];for(let x=0;x<W;x++){t[b+x]=s/w;s+=g[b+cl(x+r+1,W-1)]-g[b+cl(x-r,W-1)]}}
+ for(let x=0;x<W;x++){let s=0;for(let y=-r;y<=r;y++)s+=t[cl(y,H-1)*W+x];for(let y=0;y<H;y++){o[y*W+x]=s/w;s+=t[cl(y+r+1,H-1)*W+x]-t[cl(y-r,H-1)*W+x]}}
+ return o}
+function otsuG(g){const h=new Array(256).fill(0),n=g.length;for(let i=0;i<n;i++)h[g[i]|0]++;let sum=0;for(let t=0;t<256;t++)sum+=t*h[t];let sb=0,wb=0,mx=-1,th=127;
+ for(let t=0;t<256;t++){wb+=h[t];if(!wb)continue;const wf=n-wb;if(!wf)break;sb+=t*h[t];const mb=sb/wb,mf=(sum-sb)/wf,v=wb*wf*(mb-mf)*(mb-mf);if(v>mx){mx=v;th=t}}return th}
+function winSum(b,W,H,k,f){const h=k>>1,W1=W+1,I=new Int32Array(W1*(H+1)),o=new Uint8Array(W*H);
+ for(let y=0;y<H;y++){let r=0;for(let x=0;x<W;x++){r+=b[y*W+x];I[(y+1)*W1+x+1]=I[y*W1+x+1]+r}}
+ for(let y=0;y<H;y++){const y0=y-h<0?0:y-h,y1=y+h+1>H?H:y+h+1;for(let x=0;x<W;x++){const x0=x-h<0?0:x-h,x1=x+h+1>W?W:x+h+1;
+  const s=I[y1*W1+x1]-I[y0*W1+x1]-I[y1*W1+x0]+I[y0*W1+x0];o[y*W+x]=f(s,(y1-y0)*(x1-x0))}}
+ return o}
+const erode=(b,W,H,k)=>winSum(b,W,H,k,(s,a)=>s===a?1:0),dilate=(b,W,H,k)=>winSum(b,W,H,k,(s)=>s>0?1:0);
+function inkOf(gray,W,H,v,L){const r=v.b?Math.max(1,Math.round(v.b*L)):0,g=boxBlur(gray,W,H,r);let th=otsuG(g);
+ if(v.d){let mn=255;for(let i=0;i<g.length;i++)if(g[i]<mn)mn=g[i];th-=v.d*(th-mn)}
+ let ink=new Uint8Array(g.length),c=0;for(let i=0;i<g.length;i++)if(g[i]<=th){ink[i]=1;c++}
+ if(c>g.length*.5)for(let i=0;i<ink.length;i++)ink[i]^=1;
+ if(v.k){let k=Math.max(3,Math.round(v.k*L));if(k%2===0)k++;ink=dilate(erode(ink,W,H,k),W,H,k)}
+ return ink}
+const VAR={clean:[{n:"nét rõ",b:0,k:0,d:0}],
+ dot:[{n:"chấm, nối vừa",b:.002,k:0,d:0},{n:"chấm, nối mạnh",b:.004,k:0,d:0}],
+ carton:[{n:"nền vân, khử vừa",b:.003,k:.005,d:0},{n:"nền vân, khử mạnh",b:.003,k:.008,d:0},{n:"nền vân, tối ưu chữ đậm",b:.005,k:.008,d:.2}]};
+VAR.auto=[VAR.clean[0],VAR.dot[0],VAR.carton[0],VAR.carton[1],VAR.carton[2],VAR.dot[1]];
+
+async function localOcr(blob,onm){
+ const bm=await createImageBitmap(blob),sc=Math.min(4,Math.max(1,1600/Math.max(bm.width,bm.height))),W=Math.round(bm.width*sc),H=Math.round(bm.height*sc),L=Math.max(W,H),cv=document.createElement("canvas");
+ cv.width=W;cv.height=H;const x=cv.getContext("2d",{willReadFrequently:true});x.drawImage(bm,0,0,W,H);
+ const gray=toGray(x.getImageData(0,0,W,H).data,W*H),list=VAR[$("#blur").value]||VAR.auto,w=await Tesseract.createWorker("eng",1,{});
+ try{await w.setParameters({tessedit_pageseg_mode:"6",preserve_interword_spaces:"1",tessedit_char_whitelist:"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:/.,-_ #()"});
+  let best=null;const tried=[];
+  for(let i=0;i<list.length;i++){const v=list[i];onm("Đang đọc ảnh... thử cách "+(i+1)+"/"+list.length);
+   const ink=inkOf(gray,W,H,v,L),im=x.createImageData(W,H);
+   for(let j=0;j<W*H;j++){const c=ink[j]?0:255;im.data[j*4]=im.data[j*4+1]=im.data[j*4+2]=c;im.data[j*4+3]=255}
+   x.putImageData(im,0,0);
+   const r=await w.recognize(await new Promise(q=>cv.toBlob(q,"image/png"))),ls=(r.data.lines||[]).map(l=>(l.words||[]).filter(q=>!(q.text.length===1&&q.confidence<50)).map(q=>q.text).join(" ")).filter(Boolean),txt=ls.length?ls.join("\n"):r.data.text.trim(),conf=Math.round(r.data.confidence);
+   tried.push(v.n+": "+(txt?conf+"%":"không đọc được"));
+   if(txt&&(!best||conf>best.conf))best={conf,txt,url:cv.toDataURL("image/png"),n:v.n};
+   if(best&&best.conf>=88)break}
+  $("#dbg").innerHTML=best?`<p class="note" style="margin:0 0 4px">Ảnh sau xử lý (cách "${esc(best.n)}", độ tin cậy ${best.conf}%):</p><img alt="Ảnh sau xử lý" style="max-width:100%;border:1px solid var(--ln);border-radius:6px" src="${best.url}"><p class="note" style="margin:4px 0 10px">Đã thử: ${esc(tried.join("; "))}</p>`:`<p class="note">Đã thử: ${esc(tried.join("; "))}. Không cách nào đọc được chữ.</p>`;
+  return best?best.txt:""}
+ finally{await w.terminate()}}
 try{if(!window.claude)st(tessMsg());else{st("Đang kiểm tra chức năng đọc ảnh...");claude.use("sample").then(async s=>{SMP=s;if(!s){st(tessMsg());return}const l=await s.limits();if(l&&l.images){CLA=true;$("#tessopt").hidden=true;st("Đọc ảnh bằng Claude: nội dung đọc từ ảnh, không lấy từ tiêu chuẩn.")}else st(tessMsg())}).catch(()=>st(tessMsg()))}}catch(e){st(tessMsg())}
 const PROMPT="Đây là ảnh chứa phần date in (in phun hoặc in laser) trên bao bì snack. CHỈ chép các dòng ký tự thuộc khối mã date in: ngày, tháng, năm, mã lô, mã ca, mã máy, giờ (ví dụ PD, BB, EX, NSX, HSD, 01A 10:30), và dòng tên khách hàng hay nơi đến nếu được in cùng khối đó. Bỏ qua hoàn toàn mọi chữ thuộc thiết kế bao bì như tên sản phẩm, hương vị (ví dụ Cheese), thành phần, logo, hướng dẫn, mã vạch. Mỗi dòng in là một dòng, từ trên xuống dưới. Giữ nguyên chữ hoa, chữ số, khoảng trắng và dấu như in. Phân biệt số 0 và chữ O, số 1 và chữ I. Không sửa lỗi, không đoán theo mẫu, không thêm bớt, không giải thích. Ký tự không rõ thì viết ?. Chỉ trả về các dòng chữ, không dùng định dạng markdown.";
 async function shrink(f){const bm=await createImageBitmap(f),q=SEL||{x:0,y:0,w:1,h:1},sx=Math.round(q.x*bm.width),sy=Math.round(q.y*bm.height),sw=Math.max(1,Math.round(q.w*bm.width)),sh=Math.max(1,Math.round(q.h*bm.height)),s=Math.min(1,1600/Math.max(sw,sh)),cv=document.createElement("canvas");cv.width=Math.round(sw*s);cv.height=Math.round(sh*s);cv.getContext("2d").drawImage(bm,sx,sy,sw,sh,0,0,cv.width,cv.height);return new Promise(r=>cv.toBlob(r,"image/jpeg",.92))}
 $("#read").onclick=async()=>{
  if(!IMG){msg("Hãy chụp hoặc chọn ảnh date trước");return}
- if(!CLA&&!window.Tesseract){msg("Chưa có chức năng đọc ảnh, hãy nhập nội dung tay");return}
+ if(!CLA&&!window.Tesseract&&!$("#aiurl").value.trim()){msg("Chưa có chức năng đọc ảnh, hãy nhập nội dung tay");return}
  const b=$("#read");b.disabled=true;b.textContent="Đang đọc ảnh...";
  try{let txt;
-  if(CLA){const r=await SMP(PROMPT,{images:[await shrink(IMG)],cache:false});txt=r.text}
-  else txt=await localOcr(await shrink(IMG),p=>{b.textContent="Đang đọc ảnh... "+Math.round(p*100)+"%"});
+  if($("#aiurl").value.trim()){ENG="ai";txt=await aiRead(await shrink(IMG))}
+  else if(CLA){ENG="claude";const r=await SMP(PROMPT,{images:[await shrink(IMG)],cache:false});txt=r.text}
+  else{ENG="tesseract";txt=await localOcr(await shrink(IMG),m=>{b.textContent=m})};
   $("#ocr").value=txt.replace(/^```\w*\n?|```$/g,"").trim();msg($("#ocr").value?"Đã đọc từ ảnh. Hãy kiểm tra text trước khi đối chiếu.":"Không đọc được chữ nào. Hãy khoanh sát vùng date, đổi Kiểu chữ in, xoay ảnh hoặc chụp lại")
  }catch(err){msg(err&&err.code==="not_granted"?"Bạn chưa cấp quyền đọc ảnh":err&&err.code==="rate_limited"?"Đọc ảnh quá nhanh, thử lại sau ít phút":"Không đọc được ảnh: "+((err&&err.message)||err)+". Hãy kiểm tra internet hoặc nhập tay")}
  finally{b.disabled=false;b.textContent="Đọc nội dung từ ảnh"}};
@@ -292,7 +339,50 @@ function renderHis(){const n=s=>H.filter(h=>h.st===s).length;
  $("#stats").innerHTML=`<div><b>${H.length}</b><small>lượt kiểm</small></div><div><b>${n("ok")}</b><small>đạt</small></div><div><b>${n("bad")}</b><small>không đạt</small></div>`;
  $("#hl").innerHTML=H.length?H.slice(0,50).map(h=>{const d=new Date(h.t);return`<div class="hi"><span>${p2(d.getHours())}:${p2(d.getMinutes())}<br><small>${p2(d.getDate())}/${p2(d.getMonth()+1)}</small></span><span>${esc(h.c)}<br><small>${h.w} · Ca ${esc(h.s)}${h.n?" · lỗi: "+esc(h.n):""}</small></span><span class="tag ${h.st}">${SL[h.st]}</span></div>`}).join(""):`<p class="note" style="margin:0">Chưa có lượt kiểm tra nào.</p>`}
 $("#clr").onclick=()=>{H=[];save();renderHis()};
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected",x===b));["check","std","his"].forEach(t=>$("#p-"+t).hidden=t!==b.dataset.t)});
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected",x===b));["check","std","his","trn"].forEach(t=>$("#p-"+t).hidden=t!==b.dataset.t);if(b.dataset.t==="trn")renderTrn()});
+
+let ENG="",LASTV="",CONF={};
+try{$("#aiurl").value=localStorage.getItem("dateAiUrl")||""}catch(e){}
+try{$("#aikey").value=localStorage.getItem("dateAiKey")||""}catch(e){}
+const aiStat=()=>{$("#ocrst").textContent=$("#aiurl").value.trim()?"Đọc ảnh bằng máy chủ đã cấu hình ở tab Huấn luyện AI (nội dung đọc từ ảnh, không lấy từ tiêu chuẩn).":(CLA?"Đọc ảnh bằng Claude: nội dung đọc từ ảnh, không lấy từ tiêu chuẩn.":tessMsg())};
+$("#aiurl").addEventListener("input",()=>{try{localStorage.setItem("dateAiUrl",$("#aiurl").value.trim())}catch(e){}aiStat()});
+$("#aikey").addEventListener("input",()=>{try{localStorage.setItem("dateAiKey",$("#aikey").value.trim())}catch(e){}});
+if($("#aiurl").value.trim())aiStat();
+async function aiRead(blob){const fd=new FormData();fd.append("image",blob,"date.jpg");
+ const k=$("#aikey").value.trim(),r=await fetch($("#aiurl").value.trim().replace(/\/$/,"")+"/read",{method:"POST",body:fd,headers:k?{"X-Access-Key":k}:{}});
+ if(!r.ok)throw new Error("Máy chủ AI trả lỗi "+r.status);
+ const j=await r.json(),L=j.lines||[];CONF={};L.forEach(l=>{if(typeof l.conf==="number")CONF[nz(l.text)]=l.conf});
+ return L.map(l=>l.text).join("\n")}
+const DBO=()=>new Promise((res,rej)=>{const r=indexedDB.open("dateTrain",1);r.onupgradeneeded=()=>r.result.createObjectStore("s",{keyPath:"id",autoIncrement:true});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+const dbDo=async(mode,fn)=>{const d=await DBO();return new Promise((res,rej)=>{const t=d.transaction("s",mode),q=fn(t.objectStore("s"));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error)})};
+const dbAll=()=>dbDo("readonly",o=>o.getAll()),dbAdd=v=>dbDo("readwrite",o=>o.add(v)),dbClr=()=>dbDo("readwrite",o=>o.clear());
+$("#sv").onclick=async()=>{
+ const txt=$("#ocr").value.trim();
+ if(!IMG){msg("Cần có ảnh để lưu mẫu");return}
+ if(!txt){msg("Ô nội dung đang trống");return}
+ if(!$("#vf").checked){msg("Hãy tick xác nhận nội dung khớp đúng chữ in trên ảnh");return}
+ try{const c=cur();
+  await dbAdd({t:Date.now(),img:await shrink(IMG),text:txt,cust:c.name,po:c.po,where:$("#where").value,shift:$("#shift").value,mach:$("#mach").value,nsx:$("#pd").value,engine:ENG||"manual",expected:expLines().map(e=>e.val||e.raw).join("\n"),verdict:LASTV});
+  $("#vf").checked=false;msg("Đã lưu mẫu huấn luyện")}
+ catch(e){msg("Không lưu được mẫu: "+((e&&e.message)||e))}};
+async function renderTrn(){let all=[];
+ try{all=await dbAll()}catch(e){$("#trc").textContent="Trình duyệt không cho lưu dữ liệu ở đây.";return}
+ const by={};all.forEach(x=>by[x.cust]=(by[x.cust]||0)+1);
+ $("#trc").innerHTML=`<div class="stats"><div><b>${all.length}</b><small>mẫu đã lưu</small></div><div><b>${Object.keys(by).length}</b><small>khách hàng</small></div></div>`+Object.entries(by).map(([k,v])=>`<div class="hi" style="grid-template-columns:1fr auto"><span>${esc(k)}</span><b>${v}</b></div>`).join("");
+ const last=all.slice(-6).reverse(),urls=await Promise.all(last.map(x=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(x.img)})));
+ $("#trl").innerHTML=last.map((x,i)=>`<div class="hi" style="grid-template-columns:130px 1fr"><img alt="" style="max-width:130px;max-height:70px;border:1px solid var(--ln)" src="${urls[i]}"><code style="white-space:pre-wrap">${esc(x.text)}</code></div>`).join("")||`<p class="note" style="margin:0">Chưa có mẫu nào.</p>`}
+$("#exp").onclick=async()=>{
+ if(!window.JSZip){msg("Chưa tải được thư viện nén ZIP");return}
+ let all=[];try{all=await dbAll()}catch(e){}
+ if(!all.length){msg("Chưa có mẫu nào để xuất");return}
+ const z=new JSZip(),im=z.folder("images"),jl=[];
+ all.forEach((x,i)=>{const n=String(i+1).padStart(6,"0")+".jpg";im.file(n,x.img);
+  jl.push(JSON.stringify({file:"images/"+n,text:x.text.split("\n"),expected:x.expected.split("\n"),verdict:x.verdict,customer:x.cust,po:x.po,where:x.where,shift:x.shift,machine:x.mach,nsx:x.nsx,engine:x.engine,saved:new Date(x.t).toISOString()}))});
+ z.file("labels.jsonl",jl.join("\n"));
+ const b=await z.generateAsync({type:"blob"}),a=document.createElement("a");
+ a.href=URL.createObjectURL(b);a.download="date-train-"+new Date().toISOString().slice(0,10)+".zip";document.body.appendChild(a);a.click();a.remove();
+ msg("Đã xuất "+all.length+" mẫu")};
+$("#trdel").onclick=async()=>{if(!confirm("Xóa toàn bộ mẫu huấn luyện đã lưu trong trình duyệt này?"))return;try{await dbClr();renderTrn();msg("Đã xóa")}catch(e){msg("Không xóa được")}};
 const n=new Date();$("#pd").value=n.getFullYear()+"-"+p2(n.getMonth()+1)+"-"+p2(n.getDate());
 renderCust();renderStd();renderHis();
 </script>
